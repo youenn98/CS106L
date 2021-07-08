@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <unordered_set>
+#include <algorithm>
 
 using std::cout;            using std::endl;
 using std::string;          using std::unordered_set;
@@ -14,7 +16,21 @@ using std::string;          using std::unordered_set;
 unordered_set<string> findWikiLinks(const string& page_html) {
     // TODO: delete this return statement and implement
     // the function!
-    return {};
+    unordered_set<string> link_found;
+    const string pattern = "<a href=\"/wiki/";
+    const string split = "/\">";
+    auto beg = page_html.begin();
+    auto found =  page_html.begin();
+    while((found = search(beg,page_html.end(),pattern.begin(),pattern.end())) != page_html.end()){
+        beg = found;
+        char ch = *found;
+        while(split.find(ch) != std::string::npos && found!=page_html.end()){
+            found++;
+        }
+        string linkstr(beg,found);
+        link_found.insert(linkstr);
+    }
+    return link_found;
 }
 
 int main() {
@@ -39,5 +55,18 @@ int main() {
     // You got this!
 
     // Write code here
-
+    std::fstream input_file(filename);
+    std::string file_str;
+    if(input_file.is_open()){
+        std::stringstream  ss;
+        ss << input_file.rdbuf();
+        file_str = ss.str();
+    }else{
+        printf("Cannot open file %s\n",filename.c_str());
+        return -1;
+    }
+    unordered_set<string> st = findWikiLinks(file_str);
+    for(auto &a: st){
+        cout << a << endl;
+    }
 }
