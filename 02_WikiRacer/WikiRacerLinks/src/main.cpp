@@ -2,11 +2,12 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_set>
+#include <set>
 #include <algorithm>
 
 using std::cout;            using std::endl;
 using std::string;          using std::unordered_set;
-
+using std::set;
 /*
  * Note that you have to pass in the file as a single string
  * into the findWikiLinks function!
@@ -14,21 +15,24 @@ using std::string;          using std::unordered_set;
  * does that sound familiar at all?
  */
 unordered_set<string> findWikiLinks(const string& page_html) {
-    // TODO: delete this return statement and implement
-    // the function!
     unordered_set<string> link_found;
     const string pattern = "<a href=\"/wiki/";
     const string split = "/\">";
     auto beg = page_html.begin();
     auto found =  page_html.begin();
+
     while((found = search(beg,page_html.end(),pattern.begin(),pattern.end())) != page_html.end()){
+        found += pattern.size();
         beg = found;
         char ch = *found;
-        while(split.find(ch) != std::string::npos && found!=page_html.end()){
+        while(split.find(ch) == std::string::npos && found!=page_html.end()){
             found++;
+            ch = *found;
         }
         string linkstr(beg,found);
-        link_found.insert(linkstr);
+
+        if(linkstr.find(':') == std::string::npos) link_found.insert(linkstr);
+        beg = found;
     }
     return link_found;
 }
@@ -66,7 +70,13 @@ int main() {
         return -1;
     }
     unordered_set<string> st = findWikiLinks(file_str);
-    for(auto &a: st){
+    set<string> st2;
+    for(auto &a:st){
+        st2.insert(a);
+    }
+
+
+    for(auto &a: st2){
         cout << a << endl;
     }
 }
