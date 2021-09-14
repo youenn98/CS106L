@@ -39,8 +39,6 @@ unordered_set<string> findWikiLinks(const string& inp) {
         beg = found;
     }
     return link_found;
-    return {};
-
 }
 
 
